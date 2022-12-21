@@ -1,13 +1,13 @@
 <template>
   <div class="htmlView">
     <div class="section">
-      <h1>frist</h1>
+      <div class="title">frist</div>
     </div>
     <div class="section">
-      <h1>second</h1>
+      <div class="title">second</div>
     </div>
     <div class="section">
-      <h1>third</h1>
+      <div class="title">third</div>
     </div>
   </div>
 </template>
@@ -33,5 +33,9 @@
 }
 .section:nth-child(odd){
   justify-content: end;
+}
+.title{
+  font-size: 60px;
+  font-weight: bolder;
 }
 </style>
