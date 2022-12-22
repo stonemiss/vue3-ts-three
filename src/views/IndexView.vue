@@ -1,13 +1,13 @@
 <template>
   <div class="htmlView">
     <div class="section">
-      <div class="title">frist</div>
+      <div class="title">FRIST</div>
     </div>
     <div class="section">
-      <div class="title">second</div>
+      <div class="title">SECOND</div>
     </div>
     <div class="section">
-      <div class="title">third</div>
+      <div class="title">THIRD</div>
     </div>
   </div>
 </template>

@@ -6,13 +6,14 @@
   import TWEEN from '@tweenjs/tween.js';
 
 
+
   
 
   // const canvas = ref<HTMLElement | null>(null)
   const scene = new THREE.Scene();
   const cameraGroup = new THREE.Group
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-  const dirlight1 = new THREE.DirectionalLight(0xffffff,0.8)
+  const dirlight1 = new THREE.DirectionalLight(0xffffff,1.0)
   const dirlight2 = new THREE.DirectionalLight(0xffffff,0.3)
   const sizes = {
     width: window.innerWidth,
@@ -28,18 +29,33 @@
     * Object
     */
 
-    const objectDistance = 4 //物体间距
-
-    const geometry1 = new THREE.DodecahedronGeometry(1)
-    const material1 = new THREE.MeshStandardMaterial({ color: 0x0000ff })
+    const objectDistance = 6 //物体间距
+    // const geometry1 = new THREE.TorusKnotGeometry(1,0.1,100,8,6,3)
+    const geometry1 = new THREE.IcosahedronGeometry(1.6,8)
+    const material1 = new THREE.MeshStandardMaterial({ 
+      color: 0xcf94ff, 
+      transparent: true,
+      opacity: 0.5,
+      wireframe : true,
+      wireframeLinewidth: 0.1
+    })
     const mesh1 = new THREE.Mesh(geometry1, material1)
-  
-    const geometry2 = new THREE.IcosahedronGeometry(1)
-    const material2 = new THREE.MeshStandardMaterial({ color: 0xffff00 })
+    console.log(mesh1);
+    
+    const geometry2 = new THREE.IcosahedronGeometry(1.6)
+    const material2 = new THREE.MeshStandardMaterial({ 
+      color: 0xffff00, 
+      transparent: true,
+      opacity: 0
+    })
     const mesh2 = new THREE.Mesh(geometry2, material2)
 
-    const geometry3 = new THREE.OctahedronGeometry(1)
-    const material3 = new THREE.MeshStandardMaterial({ color: 0xff00ff })
+    const geometry3 = new THREE.OctahedronGeometry(1.6)
+    const material3 = new THREE.MeshStandardMaterial({ 
+      color: 0xff00ff, 
+      transparent: true,
+      opacity: 0
+    })
     const mesh3 = new THREE.Mesh(geometry3, material3)
     scene.add(mesh1,mesh2,mesh3)
     sectionMeshes = [mesh1,mesh2,mesh3]
@@ -55,7 +71,7 @@
     */
     dirlight1.position.set(1,1,0)
     dirlight2.position.set(-1,1,0)
-    const ambLight = new THREE.AmbientLight(0xffffff,0.1)
+    const ambLight = new THREE.AmbientLight(0xff8c00,0.1)
     scene.add(dirlight1,dirlight2,ambLight)
     /**
      * 粒子背景
@@ -102,9 +118,35 @@
     *监听下拉
     */
     let scrollY = window.scrollY
-  
+    let activeSection = 0//当前场景
+    
     window.addEventListener('scroll',()=>{
       scrollY = window.scrollY
+      const newSection = Math.round(scrollY / sizes.height)
+      if (newSection != activeSection) {
+        //隐藏其它mesh
+        for (const mesh of sectionMeshes) {
+          mesh.material.opacity = 0
+        }
+        activeSection = newSection
+        //滑动到对应位置，物体缩放动画
+        const tween = new TWEEN.Tween({ scale: 1.0 })
+        .to({ scale: 1.2 }, 1000)
+        .easing(TWEEN.Easing.Quadratic.InOut)
+        .onUpdate(function(tw) {
+          sectionMeshes[activeSection].scale.set(tw.scale,tw.scale,tw.scale)
+        })
+        .start(); 
+        console.log(sectionMeshes[activeSection]);
+        
+        const tween_opacity = new TWEEN.Tween({ opc: 0 })
+        .to({ opc: 1 }, 1000)
+        .easing(TWEEN.Easing.Quadratic.InOut)
+        .onUpdate(function(tw) {
+          sectionMeshes[activeSection].material.opacity = tw.opc
+        })
+        .start(); 
+      }
     })
     /**
      * 监听鼠标移动
@@ -145,10 +187,11 @@
       
       for (const mesh of sectionMeshes) {
         mesh.rotation.x += deleteTime* 0.1
-        mesh.rotation.y += deleteTime* 0.2
+        mesh.rotation.y += deleteTime* 0.12
       }
 
       renderer.render(scene, camera);
+      TWEEN.update(); //动画更新
       requestAnimationFrame(tick);
     }
     tick();
